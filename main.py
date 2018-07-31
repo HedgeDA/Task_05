@@ -1,7 +1,10 @@
 import pprint
 
 
-def read_file(filename, book):
+def read_file(filename, book = None):
+    if book is None:
+        book = dict()
+
     with open(filename, encoding='utf8') as file:
         recipe_name = ''
         ingridients_count = 0
@@ -11,13 +14,13 @@ def read_file(filename, book):
             # убираем пустые и служебные символы в конце строки
             rline = line.rstrip()
 
-            if rline == '':
+            if not rline:
                 recipe_name = ''
                 ingridients_count = 0
                 ingridients = list()
                 continue
 
-            if recipe_name == '':
+            if not recipe_name:
                 recipe_name = rline
             elif ingridients_count == 0:
                 try:
@@ -45,21 +48,20 @@ def get_shop_list_by_dishes(dishes, person_count, book):
     ingridients = dict()
 
     for dish in dishes:
-        if book.get(dish) == None:
-            print('Блюдо "' + dish + '" в книге не найдено!')
-        else:
-            for ingridient in book[dish]:
-                if ingridients.get(ingridient['ingridient_name']) == None:
-                    ingridients[ingridient['ingridient_name']] = {'measure': ingridient['measure'], 'quantity' : 0}
+        if book.get(dish) is None:
+            print('Блюдо "{}" в книге не найдено!'.format(dish))
+            continue
 
-                ingridients[ingridient['ingridient_name']]['quantity'] += ingridient['quantity'] * person_count
+        for ingridient in book[dish]:
+            if ingridients.get(ingridient['ingridient_name']) is None:
+                ingridients[ingridient['ingridient_name']] = {'measure': ingridient['measure'], 'quantity' : 0}
+
+            ingridients[ingridient['ingridient_name']]['quantity'] += ingridient['quantity'] * person_count
 
     return ingridients
 
 def main():
-    book = dict()
-
-    read_file('book.txt', book)
+    book = read_file('book.txt')
 
     result = get_shop_list_by_dishes(['Фахитос', 'Омлет'], 2, book)
     pprint.pprint(result)
